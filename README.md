@@ -1,4 +1,4 @@
-# Simulador de datasets sintéticos de QoE para ambientes imersivos
+# Gerador de dados sintéticos de atenção para ambientes imersivos
 
 Gerador de dados sintéticos de atenção usuário–objeto, com as variáveis de rede
 das métricas, para avaliar esquemas de alocação de recursos em realidade virtual
@@ -39,6 +39,7 @@ referência em `dados/` (ver [Dados](#dados)).
 ## Uso
 
 ```bash
+python src/escolhe_s.py                   # escolhe S por validação cruzada interna
 python src/gerador.py --usuarios 30       # gera o dataset sintético
 python src/validacao.py                   # valida e produz as figuras
 python src/caso_uso.py --modo pe          # caso de uso (baixa a malha do OSM)
@@ -65,6 +66,7 @@ src/
   metricas.py   Meta-Imersão, QoE-CAC, alocação por water-filling
   predicao.py   ALS regularizado e fatoração não negativa
   gerador.py    geração do dataset sintético completo
+  escolhe_s.py  escolha de S por validação cruzada nas células observadas
   validacao.py  teste supervisionado (TSTR x TRTR), controles e figuras
   caso_uso.py   roteiros turísticos: experiência × equidade
 figuras/      saída, PDF vetorial
@@ -85,10 +87,11 @@ MI(u) = T(R_u) · T(1 − E_u) · Σ_n K_nu · ln( P_nu / P_th )
 **QoE-CAC** (Santos et al., SBrT 2025)
 
 ```
-QoE-CAC(u) = T(1 − I_u) · T(R_u) · T(1 − E_u) · Σ_n K_nu · ln( P_nu / P_th )
+QoE-CAC(u) = (1 − T(I_u)) · T(R_u) · T(1 − E_u) · Σ_n K_nu · ln( P_nu / P_th )
 ```
 
-A diferença é o fator de latência `T(1 − I_u)`, presente apenas na QoE-CAC.
+A diferença é o fator de latência `1 − T(I_u)`, presente apenas na QoE-CAC:
+latência alta reduz a QoE.
 Cada métrica sonda um conjunto parcialmente distinto de variáveis, de modo que
 concordância entre elas é evidência independente.
 
@@ -124,10 +127,21 @@ renderização e rede, cada componente com faixa própria. Não é sorteada de u
 faixa única nem derivada como inverso da taxa de transmissão, o que seria
 dimensionalmente incoerente.
 
-**Faixas.** MTP de 7 a 20 ms, downlink de 10 a 100 Mbit/s, BEP de 1e−8 a 1e−2 em
-escala logarítmica, FPS de 60 a 120 com 90 Hz como referência, dispositivos em
-30/50/20. Ancoradas em recomendação ITU-T e em literatura de referência; a
-fundamentação normativa detalhada está no texto do trabalho.
+**Faixas e normalização.** Para a latência motion-to-photon (MTP), o intervalo
+[7, 20] ms define os limites fixos da **normalização**, não a faixa dos dados
+gerados. No cenário normal, a latência é a soma de quatro componentes
+uniformes: sensor (0,5–2 ms), processamento (1–3 ms), renderização (2–10 ms)
+e rede (5–10 ms), podendo variar de 8,5 a 25 ms. Valores fora dos limites
+da normalização são saturados em 0 ou 1; em particular, latências acima de
+20 ms anulam o fator de latência da QoE-CAC. Essa saturação é uma decisão
+do modelo, não uma afirmação normativa sobre a QoE real.
+
+O downlink varia de 10 a 100 Mbit/s e a BEP de 1e−8 a 1e−2 (escala
+logarítmica); FPS de 60 a 120, com 90 Hz como referência, e dispositivos em
+30/50/20. A ITU-T G.1035 identifica fatores de rede que influenciam a QoE em
+VR, enquanto o 3GPP TR 26.918 oferece referências para a escolha dos limites
+de latência. Os intervalos numéricos utilizados são parâmetros do modelo;
+a fundamentação detalhada está no artigo.
 
 ## Limitações
 
