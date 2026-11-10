@@ -99,6 +99,21 @@ A normalização `T(·)` usa limites externos fixos, nunca calculados dos dados:
 limites derivados dos dados fariam referência e sintético cair na mesma escala
 por construção, tornando a comparação tautológica.
 
+**Normalização da BEP.** Nas expressões das métricas, o fator `T(1 − E_u)`
+representa uma normalização **logarítmica inversa** da probabilidade de erro de
+bit (BEP), implementada em `src/metricas.py` pela função `tau_bep`:
+
+```text
+T_BEP(E) = clip_[0,1]( [log10(10^-2) - log10(E)] /
+                      [log10(10^-2) - log10(10^-8)] )
+```
+
+Antes do logaritmo, `E` é limitado ao intervalo `[10^-8, 10^-2]`. Assim,
+`T_BEP(10^-8) = 1` e `T_BEP(10^-2) = 0`: menor BEP significa maior qualidade.
+A notação `T(1 − E_u)` **não** significa aplicar uma normalização min–max
+linear diretamente a `1 − E_u`; o fator efetivamente empregado nos cálculos
+é `T_BEP(E_u)`.
+
 ## Modelo de geração
 
 **Atenção.** Nos dados de referência, 91,9% da variância está no primeiro
@@ -117,7 +132,13 @@ sobre as células observadas; `B` e as variâncias de `f` vêm dos autovetores d
 covariância residual calculada por pares de objetos, sem imputação; `w` é a
 intensidade do ruído por objeto (raiz da variância idiossincrática,
 normalizada); `a` e `σ` são calibrados por momentos simulados sobre a mesma
-máscara. Usa-se `S = 4`, com sensibilidade para `S = 2`. Na validação, a
+máscara. A validação cruzada interna de `src/escolhe_s.py`, realizada apenas
+sobre as células observadas de treinamento, seleciona `S = 0`, isto é, o
+modelo sem fatores latentes individuais (só o perfil de popularidade).
+Os experimentos do artigo utilizam a variante `S = 4`, com análise de
+sensibilidade para `S = 2`; o padrão de `src/gerador.py` permanece `S = 4`
+para reproduzir esses experimentos. Portanto, a configuração experimental
+não deve ser confundida com a seleção por validação cruzada. Na validação, a
 máscara são as células observadas; no caso de uso, a matriz completa. `p` e `B`
 descrevem os objetos e ficam fixos, o que permite escalar de 30 para N usuários.
 Os escores são discretizados em cinco níveis por quantis, por usuário.
