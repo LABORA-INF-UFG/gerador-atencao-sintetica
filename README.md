@@ -19,8 +19,7 @@ célula de teste entra no ajuste dos parâmetros do gerador nem no treino dos
 modelos. A equivalência é decidida pelo TOST (α = 5%, margem de ±2%), com
 intervalos por *bootstrap* sobre participantes e sementes. A validação mede
 também a semelhança direta das alocações, a validação por participante (5
-dobras), controles negativos e testes de fidelidade (espectro do resíduo,
-análise paralela, pMSE, MMD e distância ao registro mais próximo). Os resultados
+dobras), controles negativos e a distância ao registro mais próximo. Os resultados
 saem de `src/validacao.py`, em `resultados/validacao.csv` e
 `resultados/relatorio_validacao.txt`, e as figuras em `figuras/`.
 
@@ -118,10 +117,8 @@ linear diretamente a `1 − E_u`; o fator efetivamente empregado nos cálculos
 
 **Atenção.** Nos dados de referência, 91,9% da variância está no primeiro
 componente e o Spearman médio entre participantes é +0,916: há um perfil global
-de popularidade de objetos, e cada participante é esse perfil mais um desvio de
-baixa dimensão. Contra um nulo por permutação, a matriz completa tem dois
-componentes do resíduo acima do percentil 97,5, e os quatro primeiros
-concentram 46,1% da variância residual (nulo: 31,5%).
+de popularidade de objetos, compartilhado pelos participantes. Só com as células
+de treinamento, os dados não têm estrutura individual.
 
 ```
 s[k,n] = a · p[n] + Σ_j f[k,j] · B[j,n] + σ · w[n] · ε[k,n]
@@ -248,8 +245,21 @@ Pirenópolis e a data da coleta (13/10/2026) estão descritos no artigo.
   filtering*. SIGIR 1999. — modelo kNN usuário.
 - Koren, Y.; Bell, R.; Volinsky, C. *Matrix factorization techniques for
   recommender systems*. Computer 42(8), 2009. — modelo MF com vieses.
+- Lee, D. D.; Seung, H. S. *Learning the parts of objects by non-negative matrix
+  factorization*. Nature 401(6755), 1999. — modelo NMF.
+- Park, N. et al. *Data synthesis based on generative adversarial networks*.
+  Proceedings of the VLDB Endowment 11(10), 2018. — distância ao registro mais
+  próximo.
+- Boeing, G. *OSMnx: new methods for acquiring, constructing, analyzing, and
+  visualizing complex street networks*. Computers, Environment and Urban
+  Systems 65, 2017. — malha de pedestres do caso de uso.
+- Held, M.; Karp, R. M. *A dynamic programming approach to sequencing
+  problems*. Journal of the Society for Industrial and Applied Mathematics
+  10(1), 1962. — programação dinâmica das rotas do caso de uso.
 - ITU-T G.1035, *Influencing factors on quality of experience for virtual
   reality services*, 2021.
+- 3GPP TR 26.918, *Virtual Reality (VR) media services over 3GPP*, versão
+  18.0.0, Release 18, 2024.
 - ITU-T P.10/G.100, *Vocabulary for performance, quality of service and quality
   of experience*, 2017.
 - ITU-T P.800.1, *Mean opinion score (MOS) terminology*, 2006.
